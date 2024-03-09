@@ -1,6 +1,6 @@
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import styles from './Holding.styles';
-import useHoldings, { Holding } from '../../hooks/useHoldings';
+import useHoldings from '../../hooks/useHoldings';
 import { Seperator } from '../../components/Seperator';
 import PortfolioSummary from '../../components/PortfolioSummary';
 import { currencyFormatter } from '../../utils/currencyFormatter';
@@ -93,7 +93,7 @@ const Holding = () => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={data as Holding[]}
+        data={data}
         renderItem={renderHoldings}
         ItemSeparatorComponent={Seperator}
         onRefresh={refetch}

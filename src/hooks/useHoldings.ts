@@ -21,14 +21,14 @@ const useHoldings = () => {
     try {
       setIsLoading(true);
       const response = await fetch(ENDPOINTS.HOLDINGS);
-      if (response.ok) {
-        const holdings: Holdings = await response.json();
-        setData(holdings.userHolding);
-      } else {
-        setError(response);
+
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText}`);
       }
+      const holdings: Holdings = await response.json();
+      setData(holdings.userHolding);
     } catch (error) {
-      setError(error);
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }
