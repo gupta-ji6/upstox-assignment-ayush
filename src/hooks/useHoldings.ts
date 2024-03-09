@@ -28,6 +28,7 @@ const useHoldings = () => {
       const holdings: Holdings = await response.json();
       setData(holdings.userHolding);
     } catch (error) {
+      console.error(error);
       setError(error.message);
     } finally {
       setIsLoading(false);

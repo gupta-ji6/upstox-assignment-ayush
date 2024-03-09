@@ -1,5 +1,10 @@
-import { ActivityIndicator, FlatList, Text, View } from 'react-native';
-import styles from './Holding.styles';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import useHoldings from '../../hooks/useHoldings';
 import { Seperator } from '../../components/Seperator';
 import PortfolioSummary from '../../components/PortfolioSummary';
@@ -106,3 +111,10 @@ const Holding = () => {
 };
 
 export default Holding;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#c3c3c8',
+  },
+});
