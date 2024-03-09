@@ -1,15 +1,23 @@
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import styles from './Holding.styles';
-import useHoldings from '../../hooks/useHoldings';
+import useHoldings, { Holding } from '../../hooks/useHoldings';
 import { Seperator } from '../../components/Seperator';
 import PortfolioSummary from '../../components/PortfolioSummary';
-import { currencyFormatter } from '../utils/currencyFormatter';
+import { currencyFormatter } from '../../utils/currencyFormatter';
+import { getCurrentValue } from '../../utils/getCurrentValue';
+import { getInvestmentValue } from '../../utils/getInvestmentValue';
+import { getProfitAndLoss } from '../../utils/getProfitAndLoss';
+import { COLORS } from '../../../constants';
 
 const Holding = () => {
   const { data, isError, isLoading, error, isRefetching, refetch } =
     useHoldings();
 
   const renderHoldings = ({ item }) => {
+    const currentValue = getCurrentValue(item.ltp, item.quantity);
+    const investmentValue = getInvestmentValue(item.avgPrice, item.quantity);
+    const profitAndLoss = getProfitAndLoss(currentValue, investmentValue);
+
     return (
       <View
         style={{
@@ -50,7 +58,7 @@ const Holding = () => {
           <Text style={{ fontSize: 14 }}>
             P/L:{' '}
             <Text style={{ fontWeight: 'bold', fontSize: 14 }}>
-              {item.profit}
+              {currencyFormatter(profitAndLoss)}
             </Text>
           </Text>
         </View>
@@ -68,7 +76,7 @@ const Holding = () => {
           gap: 10,
         }}
       >
-        <ActivityIndicator size='large' />
+        <ActivityIndicator size='large' color={COLORS.PRIMARY} />
         <Text>Loading your holdings...</Text>
       </View>
     );
@@ -85,7 +93,7 @@ const Holding = () => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={data}
+        data={data as Holding[]}
         renderItem={renderHoldings}
         ItemSeparatorComponent={Seperator}
         onRefresh={refetch}

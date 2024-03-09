@@ -1,21 +1,29 @@
 import { useEffect, useState } from 'react';
+import { ENDPOINTS } from '../../constants';
 
-const HOLDINGS_ENDPOINT =
-  'https://run.mocky.io/v3/bde7230e-bc91-43bc-901d-c79d008bddc8';
+export interface Holding {
+  avgPrice: number;
+  close: number;
+  ltp: number;
+  quantity: number;
+  symbol: string;
+}
+interface Holdings {
+  userHolding: Holding[];
+}
 
 const useHoldings = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Holding[] | []>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(HOLDINGS_ENDPOINT);
+      const response = await fetch(ENDPOINTS.HOLDINGS);
       if (response.ok) {
-        const holdings = await response.json();
+        const holdings: Holdings = await response.json();
         setData(holdings.userHolding);
-        console.log(holdings);
       } else {
         setError(response);
       }

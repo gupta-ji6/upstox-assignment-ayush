@@ -1,38 +1,53 @@
-import { Text, TouchableOpacity } from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, { useState } from 'react';
-import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
 import useHoldings from '../hooks/useHoldings';
 import { PortfolioSummaryListItem } from './PortfolioSummaryListItem';
+import getTotalCurrentValue from '../utils/getTotalCurrentValue';
+import getTotalInvestment from '../utils/getTotalInvestment';
+import { currencyFormatter } from '../utils/currencyFormatter';
+import getTodayProfitAndLoss from '../utils/getTodayProfitAndLoss';
+import { COLORS } from '../../constants';
 
 const PortfolioSummary = () => {
-  const { data, isError, isLoading, error } = useHoldings();
-
   const [isCollapsed, setIsCollapsed] = useState(true);
 
+  const { data, isError, isLoading, error } = useHoldings();
+
+  const totalCurrentValue = currencyFormatter(getTotalCurrentValue(data));
+  const totalInvestmentValue = currencyFormatter(getTotalInvestment(data));
+  const totalProfitAndLoss = currencyFormatter(
+    getTotalCurrentValue(data) - getTotalInvestment(data)
+  );
+  const todayProfitAndLoss = currencyFormatter(getTodayProfitAndLoss(data));
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size='small' color={COLORS.PRIMARY} />
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={styles.container}>
+        <Text>{error.message}</Text>
+      </View>
+    );
+  }
+
   return (
-    <Animated.View
-      style={{
-        position: 'absolute',
-        bottom: 0,
-        backgroundColor: 'white',
-        width: '100%',
-        paddingBottom: 36,
-        paddingHorizontal: 12,
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
-        borderCurve: 'continuous',
-      }}
-    >
+    <Animated.View style={styles.container}>
       <TouchableOpacity
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          // backgroundColor: 'grey',
-          paddingTop: 4,
-          paddingBottom: 16,
-        }}
+        style={styles.handle}
         onPress={() => {
           setIsCollapsed(!isCollapsed);
         }}
@@ -47,26 +62,54 @@ const PortfolioSummary = () => {
       {!isCollapsed ? (
         <Animated.View
           entering={FadeInDown}
-          style={{ paddingBottom: 16, rowGap: 4 }}
+          style={styles.collapsedBodyContainer}
         >
           <PortfolioSummaryListItem
             title='Current Value'
-            value={data?.quantity}
+            value={totalCurrentValue}
           />
           <PortfolioSummaryListItem
             title='Total Investment'
-            value={data?.quantity}
+            value={totalInvestmentValue}
           />
           <PortfolioSummaryListItem
             title="Today's Profit & Loss"
-            value={data?.quantity}
+            value={totalProfitAndLoss}
           />
         </Animated.View>
       ) : null}
 
-      <PortfolioSummaryListItem title='Profit & Loss' value={data?.quantity} />
+      <PortfolioSummaryListItem
+        title='Profit & Loss'
+        value={todayProfitAndLoss}
+      />
     </Animated.View>
   );
 };
 
 export default PortfolioSummary;
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    bottom: 0,
+    backgroundColor: 'white',
+    width: '100%',
+    paddingBottom: 36,
+    paddingHorizontal: 12,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    borderCurve: 'continuous',
+  },
+  handle: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 4,
+    paddingBottom: 16,
+  },
+  collapsedBodyContainer: {
+    paddingBottom: 16,
+    rowGap: 8,
+  },
+});
