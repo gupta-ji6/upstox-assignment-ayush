@@ -43,6 +43,7 @@ const Holding = () => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
+            paddingTop: 6,
           }}
         >
           <Text style={{ fontSize: 12 }}>{item.quantity}</Text>
